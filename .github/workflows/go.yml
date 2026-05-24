@@ -27,8 +27,24 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      - name: Test
-        run: go test -v ./...
+      - name: Test with coverage
+        run: |
+          mkdir -p test-results
+          go test -v -coverprofile=coverage.out ./... | tee test-results/results.txt
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: test-results
+          path: test-results/
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coverage
+          path: coverage.out
 
   golangci-lint:
     runs-on: ubuntu-latest
